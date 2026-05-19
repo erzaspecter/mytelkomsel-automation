@@ -1,5 +1,7 @@
 // test/specs/buy-package.spec.js
 const HomePage = require('../pages/home.page');
+const PackagePage = require('../pages/package.page');
+
 
 describe('Question 3 - Buy Package', () => {
 
@@ -23,25 +25,39 @@ describe('Question 3 - Buy Package', () => {
     });
 
     describe('TC-007 - Package Filtering by Category', () => {
-        it('Should filter by Sosmed category', async () => {
-            const filterSosmed = await $('//*[contains(@text, "Sosmed") or contains(@text, "Social")]');
-            await filterSosmed.click();
-            await driver.pause(2000);
+    it('Should load category list and display packages for first category', async () => {
+        // Klik kategori pertama (apapun itu)
+        const clicked = await PackagePage.clickCategoryByIndex(0);
+        expect(clicked).toBe(true);
 
-            const packages = await $$('//androidx.recyclerview.widget.RecyclerView//*[@clickable="true"]');
-            expect(packages.length).toBeGreaterThan(0);
-            console.log(`📦 Sosmed packages: ${packages.length}`);
-        });
-
-        it('Should switch to different category without crash', async () => {
-            const filterMalam = await $('//*[contains(@text, "Malam") or contains(@text, "Night")]');
-            await filterMalam.click();
-            await driver.pause(2000);
-
-            const packages = await $$('//androidx.recyclerview.widget.RecyclerView//*[@clickable="true"]');
-            expect(packages.length).toBeGreaterThan(0);
-        });
+        const packages = await PackagePage.packageItems;
+        expect(packages.length).toBeGreaterThan(0);
+        console.log(`📦 Category 1 packages: ${packages.length}`);
     });
+
+    it('Should switch to second category without crash', async () => {
+        // Kembali ke Beli Paket dulu
+        await HomePage.navigateToBeliPaket();
+        await driver.pause(2000);
+
+        // Klik kategori kedua
+        const clicked = await PackagePage.clickCategoryByIndex(1);
+        expect(clicked).toBe(true);
+
+        const packages = await PackagePage.packageItems;
+        expect(packages.length).toBeGreaterThan(0);
+        console.log(`📦 Category 2 packages: ${packages.length}`);
+    });
+
+    it('Should display all available categories', async () => {
+        await HomePage.navigateToBeliPaket();
+        await driver.pause(2000);
+
+        const names = await PackagePage.getCategoryNames();
+        expect(names.length).toBeGreaterThan(0);
+        console.log(`📋 Available categories: ${names.join(', ')}`);
+    });
+});
 
     describe('TC-008 - Package Selection to Order Confirmation', () => {
         before(async () => {

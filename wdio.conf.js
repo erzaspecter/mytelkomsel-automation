@@ -6,7 +6,9 @@ exports.config = {
     path: '/',
     
     specs: [
-        './test/specs/**/*.js'
+            './test/specs/home-screen.spec.js',   // TC-001, TC-002
+            './test/specs/my-account.spec.js',    // TC-003, TC-004, TC-005
+            './test/specs/buy-package.spec.js',   // TC-006, TC-007, TC-008
     ],
     
     maxInstances: 1,

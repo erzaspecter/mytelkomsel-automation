@@ -51,6 +51,47 @@ class AccountPage extends BasePage {
         } catch {
             return false;
         }
+    } // ========== TAMBAHAN KODE BARU UNTUK TC-005 ==========
+    
+    // Selector untuk navigasi ke Pengaturan Aplikasi
+    get pengaturanAplikasi() { return $('//android.widget.TextView[@text="Pengaturan Aplikasi"]'); }
+    
+    // Method logout yang benar (via Pengaturan Aplikasi)
+    async logoutViaSettings() {
+        // Scroll ke bawah untuk mencari "Pengaturan Aplikasi"
+        await driver.execute('mobile: scrollGesture', {
+            left: 100, top: 800, width: 200, height: 600,
+            direction: 'down', percent: 0.7
+        });
+        await driver.pause(1000);
+        
+        // Klik Pengaturan Aplikasi
+        await this.click(this.pengaturanAplikasi);
+        await driver.pause(2000);
+        
+        // Klik Keluar
+        await this.click(this.logoutButton);
+        await driver.pause(1000);
+        
+        // Konfirmasi logout
+        await this.click(this.confirmLogout);
+        await driver.pause(3000);
+    }
+    
+    // Cek apakah data pribadi masih terlihat (setelah logout harusnya tidak)
+    async isPersonalDataVisible() {
+        try {
+            const isVisible = await this.phoneNumber.isDisplayed();
+            return isVisible;
+        } catch {
+            return false;
+        }
+    }
+    
+    // Tekan tombol back
+    async pressBackButton() {
+        await driver.back();
+        await driver.pause(1000);
     }
 }
 

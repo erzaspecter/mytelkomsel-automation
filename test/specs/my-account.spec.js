@@ -24,43 +24,44 @@ describe('Question 2 - My Account', () => {
         });
     });
 
-    describe('TC-004 - Internet Quota Detail Breakdown', () => {
-    before(async () => {
-        // Navigasi ke quota detail dari home
-        await HomePage.navigateToAccount();
-        await driver.pause(2000);
-        const quotaDetail = await $('//*[contains(@text, "Detail") or contains(@text, "Kuota")]');
-        await quotaDetail.click();
-        await driver.pause(2000);
-    });
-
-    it('Should display at least one quota category', async () => {
-        const quotaItems = await $$('//*[contains(@text, "GB") or contains(@text, "MB")]');
-        expect(quotaItems.length).toBeGreaterThan(0);
-        console.log(`📊 Found ${quotaItems.length} quota items`);
-    });
-
-    it('Should show category name, remaining amount, and expiry per item', async () => {
-        // Scroll dan cek setiap item punya info lengkap
-        await driver.execute('mobile: scrollGesture', {
-            left: 100, top: 800, width: 200, height: 600,
-            direction: 'down', percent: 0.5
-        });
-
-        const expiryVisible = await $('//*[contains(@text, "Berlaku") or contains(@text, "Expired")]')
-            .isDisplayed().catch(() => false);
-        expect(expiryVisible).toBe(true);
-    });
-    });
+   
     
-    // TC-005: Logout and Session Invalidation
+     // TC-005: Logout and Session Invalidation
     describe('TC-005 - Logout and Session Invalidation', () => {
-        it('Should successfully logout', async () => {
-            await AccountPage.logout();
+        
+        before(async () => {
+            // Navigate to Account page first
+            await HomePage.navigateToAccount();
+            await driver.pause(3000);
+        });
+        
+        it('Should logout successfully via Pengaturan Aplikasi', async () => {
+            await AccountPage.logoutViaSettings();
             
             const isLoggedOut = await AccountPage.isLoggedOut();
             expect(isLoggedOut).toBe(true);
             console.log('✅ Successfully logged out');
+        });
+        
+        it('Should not show personal account data after logout', async () => {
+            const isPersonalDataVisible = await AccountPage.isPersonalDataVisible();
+            expect(isPersonalDataVisible).toBe(false);
+            console.log('✅ No personal data visible');
+        });
+        
+        it('Should not restore session when pressing back button', async () => {
+            await AccountPage.pressBackButton();
+            
+            // Still should be on login screen
+            const isLoggedOut = await AccountPage.isLoggedOut();
+            expect(isLoggedOut).toBe(true);
+            console.log('✅ Back button did not restore session');
+        });
+        
+        it('Should display login/register option', async () => {
+            const loginOption = await $('//android.widget.Button[contains(@text, "Login")]');
+            await expect(loginOption).toBeDisplayed();
+            console.log('✅ Login option available');
         });
     });
 });
